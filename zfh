@@ -1,0 +1,33 @@
+BOOL DoFileOpenSave(HWND hwnd, BOOL bSave) {
+	OPENFILENAME ofn;
+	char szFileName[MAX_PATH];
+
+	ZeroMemory(&ofn, sizeof(ofn));
+	szFileName[0] = 0;
+
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hwnd;
+	ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0";
+	ofn.lpstrFile = szFileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrDefExt = "txt";
+
+	if(bSave) {
+		ofn.Flags = OFN_EXPLORER|OFN_PATHMUSTEXIST|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT;
+		if(GetSaveFileName(&ofn)) {
+			if(!SaveFile(GetDlgItem(hwnd, IDC_MAIN_TEXT), szFileName)) {
+				MessageBox(hwnd, "Save file failed.", "Error",MB_OK|MB_ICONEXCLAMATION);
+				return FALSE;
+			}
+		}
+	} else {
+		ofn.Flags = OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_HIDEREADONLY;
+		if(GetOpenFileName(&ofn)) {
+			if(!LoadFile(GetDlgItem(hwnd, IDC_MAIN_TEXT), szFileName)) {
+				MessageBox(hwnd, "Load of file failed.", "Error",MB_OK|MB_ICONEXCLAMATION);
+				return FALSE;
+			}
+		}
+	}
+	return TRUE;
+}
